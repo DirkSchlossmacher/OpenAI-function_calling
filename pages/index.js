@@ -71,18 +71,35 @@ const Home = () => {
     console.log(`functions ${functions}`);
     // Here you can make API calls or other processing with the data.
     // For example:
-    axios.post('/api/completions', {
-      userPrompt: userPrompt, // assuming userPrompt is in the state
-      apiKey: apiKey, // assuming apiKey is in the state
-      functions: functions
-    })
-    .then((response) => {
-      // Handle response
-      setApiResponse(response.data); // assuming setApiResponse is a function that updates the state
-    })
-    .catch(e=>{
-      console.error(e.response)
-    });
+    const onSubmit = (data) => {
+      // ...other code here...
+    
+      fetch('/api/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userPrompt: userPrompt,
+          apiKey: apiKey,
+          functions: functions
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Handle response
+        setApiResponse(data);
+      })
+      .catch(error => {
+        // Handle error
+        console.error(error);
+      });
+    };
   };
 
   const handleApiKeyChange = (event) => {
