@@ -1,26 +1,45 @@
-import { useFieldArray, Controller } from 'react-hook-form';
+const FunctionForm = ({ func, updateFunc }) => {
+  const [parameters, setParameters] = useState(func.parameters || []);
 
-export const FunctionForm = ({ control, register, nestIndex }) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: `functions[${nestIndex}].parameters`,
-  });
+  const updateParameter = (index) => (updatedParam) => {
+    const newParameters = [...parameters];
+    newParameters[index] = updatedParam;
+    setParameters(newParameters);
+    updateFunc({ ...func, parameters: newParameters });
+  };
+
+  const addParameter = () => {
+    setParameters([...parameters, { name: "", type: "", description: "" }]);
+  };
+
+  const removeParameter = (index) => {
+    setParameters(parameters.filter((_, i) => i !== index));
+  };
 
   return (
     <div>
-      {fields.map((field, index) => (
-        <div key={field.id} className="flex">
-          <input {...register(`functions[${nestIndex}].parameters[${index}].name`)} placeholder="Parameter name" className="border-2 border-gray-200 m-2 p-2 rounded-lg" />
-          <select {...register(`functions[${nestIndex}].parameters[${index}].type`)} className="border-2 border-gray-200 m-2 p-2 rounded-lg">
-            <option value="">Select type</option>
-            <option value="string">String</option>
-            <option value="number">Number</option>
-            {/* Add as many options as needed */}
-          </select>
-          <button type="button" onClick={() => remove(index)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Remove</button>
+      <input
+        type="text"
+        placeholder="Function Name"
+        value={func.name}
+        onChange={(e) => updateFunc({ ...func, name: e.target.value })}
+      />
+      <textarea
+        placeholder="Function Description"
+        value={func.description}
+        onChange={(e) => updateFunc({ ...func, description: e.target.value })}
+      />
+      {/* Render ParameterForm components here for each parameter */}
+      {parameters.map((param, index) => (
+        <div key={index}>
+          <ParameterForm
+            param={param}
+            updateParam={updateParameter(index)}
+          />
+          <button onClick={() => removeParameter(index)}>Remove this parameter</button>
         </div>
       ))}
-      <button type="button" onClick={() => append({ name: '', type: '' })} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Parameter</button>
+      <button onClick={addParameter}>Add parameter</button>
     </div>
   );
 };
