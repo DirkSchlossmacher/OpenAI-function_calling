@@ -1,32 +1,45 @@
 import { NowRequest, NowResponse } from '@vercel/node';
 import fetch from 'node-fetch';
-
-// ...other code here...
-
 export default async (req: NowRequest, res: NowResponse) => {
-  // ...other code here...
-
   if (req.method === 'POST') {
     try {
-      // ...other code here...
+      const { userPrompt, apiKey, functions } = req.body;
 
-      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({ model: 'gpt-3.5-turbo-0613', messages, functions })
-      });
+      // Log the incoming request data
+      console.log('Incoming request data:', { userPrompt, apiKey, functions });
 
-      const openaiData = await openaiResponse.json();
+      const messages = [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: userPrompt }
+      ];
 
-      // check if the assistant's response includes a function call
-      if (openaiData.choices[0].message.function_call) {
-        // ...other code here...
-      }
+      const chatCompletionRequest = async (bail, attempt) => {
+        console.log(`ChatCompletion request attempt: ${attempt}`);
 
-      res.status(200).send(openaiData);
+        const payload = {
+          model: 'gpt-3.5-turbo-0613',
+          messages,
+          functions,
+        };
+
+        // Log the payload being sent to OpenAI
+        console.log('Payload to OpenAI:', payload);
+
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // ...
+
+      };
+
+      // ...
+
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: 'Error communicating with OpenAI' });
@@ -35,3 +48,4 @@ export default async (req: NowRequest, res: NowResponse) => {
     res.status(400).send({ error: 'Only POST requests are accepted' });
   }
 };
+
