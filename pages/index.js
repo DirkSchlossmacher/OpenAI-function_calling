@@ -107,14 +107,10 @@ const Home = () => {
     <div>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <input 
-            type="textarea"
+          <textarea 
             value={userPrompt}
             onChange={handleUserPromptChange}
             placeholder="Enter your user message"
-          />
-          <label 
-            value="API Key"
           />
           <input 
             type="text"
