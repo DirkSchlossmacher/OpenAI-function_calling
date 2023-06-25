@@ -68,12 +68,10 @@ const Home = () => {
 
     console.log(`apiKey ${apiKey}: ${userPrompt}`);
 
+    console.log(`functions ${functions}`);
     // Here you can make API calls or other processing with the data.
     // For example:
     axios.post('/api/completions', {
-
-      console.log(`functions ${functions}`);
-
       userPrompt: userPrompt, // assuming userPrompt is in the state
       apiKey: apiKey, // assuming apiKey is in the state
       functions: functions
