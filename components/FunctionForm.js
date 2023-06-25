@@ -1,45 +1,70 @@
-const FunctionForm = ({ func, updateFunc }) => {
-  const [parameters, setParameters] = useState(func.parameters || []);
+import { useFieldArray, Controller } from 'react-hook-form';
+import { TextField, Button, Grid } from '@material-ui/core';
 
-  const updateParameter = (index) => (updatedParam) => {
-    const newParameters = [...parameters];
-    newParameters[index] = updatedParam;
-    setParameters(newParameters);
-    updateFunc({ ...func, parameters: newParameters });
-  };
-
-  const addParameter = () => {
-    setParameters([...parameters, { name: "", type: "", description: "" }]);
-  };
-
-  const removeParameter = (index) => {
-    setParameters(parameters.filter((_, i) => i !== index));
-  };
+export const FunctionForm = ({ nestIndex, control, register }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `functions[${nestIndex}].parameters`
+  });
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Function Name"
-        value={func.name}
-        onChange={(e) => updateFunc({ ...func, name: e.target.value })}
-      />
-      <textarea
-        placeholder="Function Description"
-        value={func.description}
-        onChange={(e) => updateFunc({ ...func, description: e.target.value })}
-      />
-      {/* Render ParameterForm components here for each parameter */}
-      {parameters.map((param, index) => (
-        <div key={index}>
-          <ParameterForm
-            param={param}
-            updateParam={updateParameter(index)}
-          />
-          <button onClick={() => removeParameter(index)}>Remove this parameter</button>
-        </div>
-      ))}
-      <button onClick={addParameter}>Add parameter</button>
-    </div>
+    <Grid container direction="column" spacing={2}>
+      <Grid item>
+        <Controller
+          name={`functions[${nestIndex}].name`}
+          control={control}
+          defaultValue=""
+          render={({ field }) => <TextField {...field} label="Function Name" />}
+        />
+      </Grid>
+      <Grid item>
+        <Controller
+          name={`functions[${nestIndex}].description`}
+          control={control}
+          defaultValue=""
+          render={({ field }) => <TextField {...field} label="Function Description" />}
+        />
+      </Grid>
+      {fields.map((item, k) => {
+        return (
+          <Grid container item key={item.id} spacing={2}>
+            <Grid item xs={4}>
+              <Controller
+                name={`functions[${nestIndex}].parameters[${k}].name`}
+                control={control}
+                defaultValue=""
+                render={({ field }) => <TextField {...field} label="Parameter Name" />}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <Controller
+                name={`functions[${nestIndex}].parameters[${k}].type`}
+                control={control}
+                defaultValue=""
+                render={({ field }) => <TextField {...field} label="Parameter Type" />}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <Controller
+                name={`functions[${nestIndex}].parameters[${k}].description`}
+                control={control}
+                defaultValue=""
+                render={({ field }) => <TextField {...field} label="Parameter Description" />}
+              />
+            </Grid>
+            <Grid item>
+              <Button variant="outlined" color="secondary" onClick={() => remove(k)}>
+                Delete Parameter
+              </Button>
+            </Grid>
+          </Grid>
+        );
+      })}
+      <Grid item>
+        <Button variant="outlined" color="primary" onClick={() => append({ name: '', type: '', description: '' })}>
+          Add Parameter
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
