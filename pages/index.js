@@ -129,14 +129,14 @@ const Home = () => {
                   setFunctions(newFunctions);
                 }}
               />
-              <button onClick={() => removeFunction(index)}>Remove this function</button>
+              <button variant="outlined" color="secondary" onClick={() => removeFunction(index)}>Remove this function</button>
             </div>
           ))}
-          <button onClick={addFunction}>Add function</button>
+          <button onClick={addFunction} variant="outlined" color="secondary">Add function</button>
           {methods.watch('functions').map((item, index) => (
             <FunctionForm key={item.id} nestIndex={index} control={control} register={register} />
           ))}
-          <button type="submit">Submit</button>
+          <button variant="outlined" color="secondary" type="submit">Submit</button>
         </form>
       </FormProvider>
       {apiResponse && <div>{apiResponse}</div>}
