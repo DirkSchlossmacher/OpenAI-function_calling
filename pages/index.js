@@ -52,7 +52,6 @@ const Home = () => {
 
   
   const onSubmit = (data) => {
-    event.preventDefault();
     const { functions } = data;
     
     // This logs the list of functions with their parameters, which are submitted with the form.
