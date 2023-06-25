@@ -72,9 +72,9 @@ const Home = () => {
     // Here you can make API calls or other processing with the data.
     // For example:
     axios.post('/api/completions', {
-      userPrompt: ${userPrompt}, // assuming userPrompt is in the state
-      apiKey: ${apiKey}, // assuming apiKey is in the state
-      functions: ${functions}
+      userPrompt: userPrompt, // assuming userPrompt is in the state
+      apiKey: apiKey, // assuming apiKey is in the state
+      functions: functions
     })
     .then((response) => {
       // Handle response
