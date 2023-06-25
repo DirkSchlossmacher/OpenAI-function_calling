@@ -65,7 +65,8 @@ const Home = () => {
 
     console.log(`apiKey ${apiKey}: ${userPrompt}`);
 
-    console.log(`functions ${functions}`);
+    console.log(`functions ${functions}`+JSON.stringify({ model: 'gpt-3.5-turbo-0613', messages, functions }));
+    
     // Here you can make API calls or other processing with the data.
     // For example:
     const onSubmit = (data) => {
