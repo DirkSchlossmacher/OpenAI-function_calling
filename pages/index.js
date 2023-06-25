@@ -80,9 +80,8 @@ const Home = () => {
       // Handle response
       setApiResponse(response.data); // assuming setApiResponse is a function that updates the state
     })
-    .catch((error) => {
-      // Handle error
-      console.error(error);
+    .catch(e=>{
+      console.error(e.response)
     });
   };
 
