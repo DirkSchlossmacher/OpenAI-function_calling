@@ -50,7 +50,7 @@ const Home = () => {
   const [apiKey, setApiKey] = useLocalStorage('OPENAI_KEY', "");
 
   
-  const onSubmit = async (data) => {
+  const onSubmit = async (data, event) => {
     event.preventDefault();
     const { functions } = data;
     
