@@ -13,6 +13,10 @@ const functionMap = {
   // Add more functions as needed
 };
 
+
+console.log(`NowRequest ${NowRequest}`);
+
+
 export default async (req: NowRequest, res: NowResponse) => {
   if (req.method === 'POST') {
     try {
