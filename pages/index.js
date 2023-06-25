@@ -75,16 +75,6 @@ const Home = () => {
       { role: 'system', content: 'You are a helpful assistant.' },
       { role: 'user', content: userPrompt }
     ];
-  const onSubmit = async (data) => {
-    event.preventDefault();
-    const { functions } = data;
-
-    // the rest of your log codes...
-
-    const messages = [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: userPrompt }
-    ];
 
     const chatCompletionRequest = async (bail, attempt) => {
       console.log(`ChatCompletion request attempt: ${attempt}`);
