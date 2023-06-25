@@ -46,7 +46,7 @@ export default async (req: NowRequest, res: NowResponse) => {
       res.status(200).send(openaiResponse.data);
     } catch (error) {
       console.error(error);
-      res.status(500).send({ error: 'Error communicating with OpenAI' });
+      res.status(500).send({ error: `Error communicating with OpenAI: ${error.message}` });
     }
   } else {
     res.status(400).send({ error: 'Only POST requests are accepted' });
