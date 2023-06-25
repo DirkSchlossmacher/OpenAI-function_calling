@@ -21,6 +21,7 @@ const Home = () => {
     localStorage.setItem("OPENAI_KEY", event.target.value);
   }
 
+  
   return (
     <div>
       <FormProvider {...methods}>
