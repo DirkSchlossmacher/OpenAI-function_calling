@@ -2,9 +2,6 @@ import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { FunctionForm } from '../components/FunctionForm';
 
-import axios from 'axios';
-
-
 // New Hook for managing localStorage
 function useLocalStorage(key, initialValue) {
   // State to store our value
