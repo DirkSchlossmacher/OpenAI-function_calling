@@ -1,52 +1,35 @@
 import { NowRequest, NowResponse } from '@vercel/node';
-import axios from 'axios';
+import fetch from 'node-fetch';
 
-// Map of functions
-const functionMap = {
-  get_current_weather: async (args) => {
-    // Implementation of get_current_weather
-    // This is just a placeholder. You'll replace it with the actual implementation.
-  },
-  another_function: async (args) => {
-    // Implementation of another_function
-  },
-  // Add more functions as needed
-};
+// ...other code here...
 
 export default async (req: NowRequest, res: NowResponse) => {
+  // ...other code here...
+
   if (req.method === 'POST') {
-    console.log(`Received POST request`); // Log here to check if POST request is received
     try {
-      const { userPrompt, apiKey, functions } = req.body;
+      // ...other code here...
 
-      const messages = [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: userPrompt }
-      ];
+      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({ model: 'gpt-3.5-turbo-0613', messages, functions })
+      });
 
-      const openaiResponse = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
-        { model: 'gpt-3.5-turbo-0613', messages, functions },
-        { headers: { Authorization: `Bearer ${apiKey}` } }
-      );
-      
+      const openaiData = await openaiResponse.json();
+
       // check if the assistant's response includes a function call
-      if (openaiResponse.data.choices[0].message.function_call) {
-        const functionCall = openaiResponse.data.choices[0].message.function_call;
-
-        // call the relevant function based on the function's name
-        if (functionMap[functionCall.name]) {
-          const result = await functionMap[functionCall.name](functionCall.arguments);
-
-          // Add the result of the function call to the response
-          openaiResponse.data.choices[0].message.function_result = result;
-        }
+      if (openaiData.choices[0].message.function_call) {
+        // ...other code here...
       }
 
-      res.status(200).send(openaiResponse.data);
+      res.status(200).send(openaiData);
     } catch (error) {
       console.error(error);
-      res.status(500).send({ error: `Error communicating with OpenAI: ${error.message}` });
+      res.status(500).send({ error: 'Error communicating with OpenAI' });
     }
   } else {
     res.status(400).send({ error: 'Only POST requests are accepted' });
