@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { FunctionForm } from '../components/FunctionForm';
 
+import axios from 'axios';
+
+
 // New Hook for managing localStorage
 function useLocalStorage(key, initialValue) {
   // State to store our value
@@ -47,10 +50,37 @@ const Home = () => {
   const [userPrompt, setUserPrompt] = useLocalStorage('userPrompt', "");
   const [apiKey, setApiKey] = useLocalStorage('OPENAI_KEY', "");
 
+  
   const onSubmit = (data) => {
-    // Submit the data to your /api/completions.ts function.
-    // Remember to include the userPrompt and apiKey in your request.
-    console.log(data);
+    const { functions } = data;
+    
+    // This logs the list of functions with their parameters, which are submitted with the form.
+    // Each function is an object with 'name', 'description', and 'parameters' fields.
+    functions.forEach((func, index) => {
+      console.log(`Function ${index + 1}:`);
+      console.log(`Name: ${func.name}`);
+      console.log(`Description: ${func.description}`);
+      console.log('Parameters:');
+      func.parameters.forEach((param, paramIndex) => {
+        console.log(`Parameter ${paramIndex + 1}: ${param}`);
+      });
+    });
+  
+    // Here you can make API calls or other processing with the data.
+    // For example:
+    axios.post('/api/completions', {
+      userPrompt: userPrompt, // assuming userPrompt is in the state
+      apiKey: apiKey, // assuming apiKey is in the state
+      functions: functions
+    })
+    .then((response) => {
+      // Handle response
+      setApiResponse(response.data); // assuming setApiResponse is a function that updates the state
+    })
+    .catch((error) => {
+      // Handle error
+      console.error(error);
+    });
   };
 
   const handleApiKeyChange = (event) => {
@@ -61,6 +91,18 @@ const Home = () => {
     setUserPrompt(event.target.value);
   }
 
+  const [functions, setFunctions] = useState([{ name: '', description: '', parameters: [] }]);
+
+  const addFunction = () => {
+    setFunctions([...functions, { name: '', description: '', parameters: [] }]);
+  };
+  
+  const removeFunction = (index) => {
+    setFunctions(functions.filter((_, i) => i !== index));
+  };
+
+
+  
   return (
     <div>
       <FormProvider {...methods}>
@@ -78,6 +120,20 @@ const Home = () => {
             placeholder="Enter your OpenAI API Key"
           />
           {/* Render FunctionForm components here for each function */}
+          {functions.map((func, index) => (
+            <div key={index}>
+              <FunctionForm 
+                func={func} 
+                updateFunc={(updatedFunc) => {
+                  const newFunctions = [...functions];
+                  newFunctions[index] = updatedFunc;
+                  setFunctions(newFunctions);
+                }}
+              />
+              <button onClick={() => removeFunction(index)}>Remove this function</button>
+            </div>
+          ))}
+          <button onClick={addFunction}>Add function</button>
           {methods.watch('functions').map((item, index) => (
             <FunctionForm key={item.id} nestIndex={index} control={control} register={register} />
           ))}
