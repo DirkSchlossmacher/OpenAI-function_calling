@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { FunctionForm } from '../components/FunctionForm';
+import fetch from 'node-fetch';
+import retry from 'async-retry';
 
 // New Hook for managing localStorage
 function useLocalStorage(key, initialValue) {
@@ -48,7 +50,8 @@ const Home = () => {
   const [apiKey, setApiKey] = useLocalStorage('OPENAI_KEY', "");
 
   
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    event.preventDefault();
     const { functions } = data;
     
     // This logs the list of functions with their parameters, which are submitted with the form.
@@ -63,41 +66,65 @@ const Home = () => {
       });
     });
 
+
     console.log(`apiKey ${apiKey}: ${userPrompt}`);
 
     console.log(`functions ${functions}`+ JSON.stringify({ model: 'gpt-3.5-turbo-0613', functions }));
-    
-    // Here you can make API calls or other processing with the data.
-    // For example:
-    const onSubmit = (data) => {
-      // ...other code here...
-    
-      fetch('/api/completions', {
+
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: userPrompt }
+    ];
+  const onSubmit = async (data) => {
+    event.preventDefault();
+    const { functions } = data;
+
+    // the rest of your log codes...
+
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: userPrompt }
+    ];
+
+    const chatCompletionRequest = async (bail, attempt) => {
+      console.log(`ChatCompletion request attempt: ${attempt}`);
+
+      const payload = {
+        model: 'gpt-3.5-turbo-0613',
+        messages,
+        functions,
+      };
+
+      // Log the payload being sent to OpenAI
+      console.log('Payload to OpenAI:', payload);
+
+      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
         },
-        body: JSON.stringify({
-          userPrompt: userPrompt,
-          apiKey: apiKey,
-          functions: functions
-        })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Handle response
-        setApiResponse(data);
-      })
-      .catch(error => {
-        // Handle error
-        console.error(error);
+        body: JSON.stringify(payload)
       });
+
+      if (!openaiResponse.ok) {
+        const error = new Error(openaiResponse.statusText);
+        error.response = openaiResponse;
+        return bail(error);
+      }
+
+      const openaiData = await openaiResponse.json();
+
+      return openaiData;
     };
+
+    try {
+      const response = await retry(chatCompletionRequest, { retries: 3 });
+      setApiResponse(response);
+    } catch (error) {
+      console.error('Failed to get OpenAI completion: ', error);
+    }
+    
   };
 
   const handleApiKeyChange = (event) => {
